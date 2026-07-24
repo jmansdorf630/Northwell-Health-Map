@@ -1,3 +1,6 @@
-streamlit>=1.40.0,<2
-folium>=0.16.0,<1
-streamlit-folium>=0.20.0,<1
+# Compatible with Streamlit Community Cloud (Python 3.12–3.14).
+# Avoid older streamlit pins: they pull numpy<2 / pillow<11 without modern wheels.
+streamlit>=1.55.0,<2
+folium>=0.19.0,<1
+streamlit-folium>=0.24.0,<1
+pillow>=11.2.1,<13
