@@ -1,3 +1,6 @@
+# Bump this when hospital/service data changes (shown under the app title).
+DATA_LAST_UPDATED = "2026-07-24"
+
 HOSPITALS = [
     # ── Western Region ───────────────────────────────────────────────────────
     {
