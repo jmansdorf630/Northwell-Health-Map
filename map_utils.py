@@ -58,21 +58,29 @@ def marker_radius(hospital: dict, *, min_r: int = 8, max_r: int = 18) -> int:
     return int(round(min_r + t * (max_r - min_r)))
 
 
-def _popup_html(hospital: dict) -> str:
+def _popup_html(hospital: dict, *, preview: int = 8) -> str:
+    """Compact popup: region + a short service preview (full list is in the card)."""
     tbd = hospital["services"] == ["TBD"]
     if tbd:
         services_html = '<span style="color:#888;font-size:12px;">Programs TBD</span>'
     else:
+        shown = hospital["services"][:preview]
         services_html = "".join(
             f'<span style="display:inline-block;background:#e8f0fb;color:#185FA5;'
             f'border-radius:20px;padding:2px 9px;font-size:11px;margin:2px;">{s}</span>'
-            for s in hospital["services"]
+            for s in shown
         )
+        remaining = len(hospital["services"]) - len(shown)
+        if remaining > 0:
+            services_html += (
+                f'<div style="margin-top:6px;font-size:11px;color:#888;">'
+                f"+{remaining} more in hospital list</div>"
+            )
     return f"""
-    <div style="font-family:sans-serif;min-width:220px;max-width:280px;">
-        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:#1a1a1a;">{hospital['name']}</div>
+    <div style="font-family:sans-serif;min-width:200px;max-width:260px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px;color:#1a1a1a;">{hospital['name']}</div>
         <div style="font-size:11px;color:#666;margin-bottom:8px;font-weight:600;text-transform:uppercase;
-            letter-spacing:0.05em;">{hospital['region']} Region</div>
+            letter-spacing:0.05em;">{hospital['region']} · {service_count(hospital)} services</div>
         <div style="border-top:1px solid #eee;padding-top:8px;">{services_html}</div>
     </div>
     """
