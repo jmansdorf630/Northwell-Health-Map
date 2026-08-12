@@ -1,7 +1,79 @@
 import streamlit as st
 import folium
+from branca.element import MacroElement, Template
 from streamlit_folium import st_folium
 from data import HOSPITALS
+
+
+class RegionLegend(MacroElement):
+    """Leaflet control legend with high-contrast labels over the basemap."""
+
+    def __init__(self, regions: dict):
+        super().__init__()
+        self._name = "RegionLegend"
+        rows = "".join(
+            f'<div class="nw-legend-row">'
+            f'<span class="nw-legend-dot" style="background:{color};"></span>'
+            f'<span class="nw-legend-label">{region}</span>'
+            f"</div>"
+            for region, color in regions.items()
+        )
+        self._template = Template(
+            """
+            {% macro script(this, kwargs) %}
+            var {{ this.get_name() }} = L.control({position: 'bottomleft'});
+            {{ this.get_name() }}.onAdd = function(map) {
+                var div = L.DomUtil.create('div', 'nw-map-legend');
+                div.innerHTML = `
+                    <style>
+                      .nw-map-legend {
+                        background: #ffffff;
+                        color: #111111;
+                        padding: 10px 14px;
+                        border-radius: 8px;
+                        border: 1px solid #b0b0b0;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.28);
+                        font: 600 12px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                        margin: 10px;
+                        min-width: 110px;
+                      }
+                      .nw-map-legend .nw-legend-title {
+                        font-weight: 700;
+                        color: #111111;
+                        margin-bottom: 6px;
+                        font-size: 12px;
+                      }
+                      .nw-map-legend .nw-legend-row {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        margin: 4px 0;
+                      }
+                      .nw-map-legend .nw-legend-dot {
+                        width: 12px;
+                        height: 12px;
+                        border-radius: 50%;
+                        flex: 0 0 12px;
+                        border: 1px solid rgba(0,0,0,0.2);
+                        box-sizing: border-box;
+                      }
+                      .nw-map-legend .nw-legend-label {
+                        color: #111111;
+                        font-weight: 600;
+                        font-size: 12px;
+                      }
+                    </style>
+                    <div class="nw-legend-title">Region</div>
+                    """
+            + rows
+            + """
+                `;
+                return div;
+            };
+            {{ this.get_name() }}.addTo({{ this._parent.get_name() }});
+            {% endmacro %}
+            """
+        )
 
 st.set_page_config(
     page_title="Northwell Telehealth Footprint",
@@ -172,21 +244,7 @@ with map_col:
             tooltip=h["name"],
         ).add_to(m)
 
-    # Legend
-    legend_html = """
-    <div style="position:fixed;bottom:30px;left:30px;z-index:1000;
-        background:white;padding:12px 16px;border-radius:10px;
-        border:1px solid #ddd;font-family:sans-serif;font-size:12px;">
-        <div style="font-weight:700;margin-bottom:8px;">Region</div>
-    """
-    for region, color in REGION_HEX.items():
-        legend_html += f"""
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-            <div style="width:12px;height:12px;border-radius:50%;background:{color};flex-shrink:0;"></div>
-            <span>{region}</span>
-        </div>"""
-    legend_html += "</div>"
-    m.get_root().html.add_child(folium.Element(legend_html))
+    m.add_child(RegionLegend(REGION_HEX))
 
     st_folium(m, height=520, use_container_width=True)
 
