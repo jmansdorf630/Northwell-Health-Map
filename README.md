@@ -3,7 +3,7 @@
 Interactive Streamlit app showing hospital-based telehealth services across all Northwell regions.
 
 ## Features
-- Real map with accurate hospital coordinates (Folium + CartoDB basemap)
+- Real map with accurate hospital coordinates (Folium + colorful CartoDB Voyager basemap)
 - Click any pin for a popup listing all telehealth services
 - Sidebar filters by region and by specific service
 - Hospital list panel with quick-scan service tags
