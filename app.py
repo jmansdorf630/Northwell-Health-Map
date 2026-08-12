@@ -131,9 +131,17 @@ with map_col:
     m = folium.Map(
         location=[40.85, -73.6],
         zoom_start=9,
-        tiles="CartoDB positron",
+        tiles=None,
         control_scale=True,
     )
+    # Colorful street basemap (replaces gray CartoDB Positron)
+    folium.TileLayer(
+        tiles="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> '
+             '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+        name="CartoDB Voyager",
+        max_zoom=19,
+    ).add_to(m)
 
     for h in filtered:
         color = REGION_COLORS.get(h["region"], "#333")
