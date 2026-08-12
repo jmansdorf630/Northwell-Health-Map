@@ -13,7 +13,7 @@ class RegionLegend(MacroElement):
         self._name = "RegionLegend"
         rows = "".join(
             f'<div class="nw-legend-row">'
-            f'<span class="nw-legend-dot" style="background:{color};"></span>'
+            f'<span class="nw-legend-pin" style="background:{color};"></span>'
             f'<span class="nw-legend-label">{region}</span>'
             f"</div>"
             for region, color in regions.items()
@@ -49,10 +49,11 @@ class RegionLegend(MacroElement):
                         gap: 8px;
                         margin: 4px 0;
                       }
-                      .nw-map-legend .nw-legend-dot {
+                      .nw-map-legend .nw-legend-pin {
                         width: 12px;
                         height: 12px;
-                        border-radius: 50%;
+                        border-radius: 50% 50% 50% 0;
+                        transform: rotate(-45deg);
                         flex: 0 0 12px;
                         border: 1px solid rgba(0,0,0,0.2);
                         box-sizing: border-box;
@@ -74,6 +75,27 @@ class RegionLegend(MacroElement):
             {% endmacro %}
             """
         )
+
+
+def pinpoint_icon(color: str, faded: bool = False) -> folium.DivIcon:
+    """Colored map pin anchored at the tip."""
+    opacity = 0.55 if faded else 1.0
+    html = f"""
+    <div style="opacity: {opacity}; line-height: 0;">
+      <svg width="28" height="40" viewBox="0 0 28 40" xmlns="http://www.w3.org/2000/svg"
+           style="display:block; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));">
+        <path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.268 21.732 0 14 0z"
+              fill="{color}" stroke="#ffffff" stroke-width="1.75"/>
+        <circle cx="14" cy="14" r="5" fill="#ffffff"/>
+      </svg>
+    </div>
+    """
+    return folium.DivIcon(
+        html=html,
+        icon_size=(28, 40),
+        icon_anchor=(14, 40),
+        class_name="nw-pinpoint",
+    )
 
 st.set_page_config(
     page_title="Northwell Telehealth Footprint",
@@ -214,7 +236,7 @@ with map_col:
     ).add_to(m)
 
     for h in filtered:
-        color = REGION_COLORS.get(h["region"], "#333")
+        color = REGION_HEX.get(h["region"], "#333333")
         tbd = h["services"] == ["TBD"]
 
         services_html = "".join(
@@ -232,14 +254,9 @@ with map_col:
         </div>
         """
 
-        folium.CircleMarker(
+        folium.Marker(
             location=[h["lat"], h["lng"]],
-            radius=9 if not tbd else 7,
-            color="white",
-            weight=2,
-            fill=True,
-            fill_color=color,
-            fill_opacity=0.9 if not tbd else 0.5,
+            icon=pinpoint_icon(color, faded=tbd),
             popup=folium.Popup(popup_html, max_width=300),
             tooltip=h["name"],
         ).add_to(m)
