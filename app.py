@@ -225,12 +225,12 @@ with map_col:
         zoom_start=9,
         tiles=None,
         control_scale=True,
+        attributionControl=False,
     )
     # Colorful street basemap (replaces gray CartoDB Positron)
     folium.TileLayer(
         tiles="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> '
-             '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+        attr=" ",
         name="CartoDB Voyager",
         max_zoom=19,
     ).add_to(m)
