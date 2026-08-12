@@ -81,8 +81,6 @@ BADGE_BG = {
 
 # ── Sidebar filters ──────────────────────────────────────────────────────────
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Northwell_Health_logo.svg/320px-Northwell_Health_logo.svg.png", width=180)
-    st.markdown("---")
     st.markdown("### Filters")
 
     all_regions = sorted(set(h["region"] for h in HOSPITALS))
